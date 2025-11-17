@@ -25,24 +25,10 @@ export class Tutorial extends Scene {
     }
 
     create() {
-        this.add.rectangle(
-            720,
-            960,
-            1440,
-            1920,
-            globals.hexNum(globals.colors.white600)
-        );
-
         this.add
-            .text(720, 300, "BUG SMASH", {
-                ...globals.bodyTextStyle,
-                wordWrap: globals.wordWrap.lg,
-                fontSize: "128px",
-                fill: globals.hexString(globals.colors.red600),
-                stroke: globals.hexString(globals.colors.black600),
-                strokeThickness: 8,
-            })
-            .setOrigin(0.5);
+            .image(globals.centerX, globals.centerY, "tutBg")
+            .setOrigin(0.5)
+            .setScale(2.5);
 
         this.showTooltip();
     }
