@@ -1,0 +1,202 @@
+export default class Bug extends Phaser.GameObjects.Container {
+    constructor(scene, x, y, config) {
+        super(scene, x, y);
+        this.scene = scene;
+
+        this.type = config.type;
+        this.health = config.health;
+        this.maxHealth = config.health;
+        this.speed = config.speed;
+        this.points = config.points;
+        this.color = config.color;
+        this.size = config.size;
+        this.isAlive = true;
+        this.isStuck = false;
+        this.movingToPlayer = false;
+
+        this.currentTween = null;
+
+        const body = scene.add.circle(0, 0, this.size, this.color);
+        this.add(body);
+
+        const head = scene.add.circle(
+            0,
+            -this.size * 0.66,
+            this.size * 0.53,
+            this.color - 0x111111
+        );
+        this.add(head);
+
+        const graphics = scene.add.graphics();
+        graphics.lineStyle(4, 0x000000, 1);
+        graphics.lineBetween(
+            -this.size * 0.2,
+            -this.size,
+            -this.size * 0.53,
+            -this.size * 1.46
+        );
+        graphics.lineBetween(
+            this.size * 0.2,
+            -this.size,
+            this.size * 0.53,
+            -this.size * 1.46
+        );
+        this.add(graphics);
+
+        if (["tank", "boss"].includes(this.type)) {
+            const healthBarBg = scene.add.rectangle(
+                0,
+                this.size + 15,
+                this.size * 2,
+                8,
+                0x000000
+            );
+            const healthBar = scene.add.rectangle(
+                0,
+                this.size + 15,
+                this.size * 2,
+                6,
+                0x00ff00
+            );
+            this.add(healthBarBg);
+            this.add(healthBar);
+            this.healthBar = healthBar;
+            this.maxHealthBarWidth = this.size * 2;
+        }
+
+        scene.add.existing(this);
+    }
+
+    takeDamage() {
+        this.health--;
+        if (this.healthBar) {
+            const ratio = this.health / this.maxHealth;
+            this.healthBar.width = this.maxHealthBarWidth * ratio;
+            this.healthBar.setFillStyle(
+                ratio > 0.5 ? 0x00ff00 : ratio > 0.25 ? 0xffff00 : 0xff0000
+            );
+        }
+        if (this.health <= 0) this.die();
+        else {
+            this.scene.tweens.add({
+                targets: this,
+                scaleX: 1.2,
+                scaleY: 1.2,
+                duration: 100,
+                yoyo: true,
+            });
+        }
+    }
+
+    die() {
+        this.isAlive = false;
+        if (this.currentTween) this.currentTween.stop();
+        this.scene.tweens.add({
+            targets: this,
+            scaleX: 1.3,
+            scaleY: 0.3,
+            alpha: 0,
+            duration: 120,
+            onComplete: () => this.destroy(),
+        });
+    }
+
+    jumpTo(x, y, afterJumpCallback) {
+        this.movingToPlayer = false;
+        if (this.currentTween) this.currentTween.stop();
+
+        this.scene.tweens.add({
+            targets: this,
+            scaleX: 1.4,
+            scaleY: 1.4,
+            duration: 150,
+            yoyo: true,
+            onComplete: () => {
+                this.currentTween = this.scene.tweens.add({
+                    targets: this,
+                    x,
+                    y,
+                    duration: 200,
+                    ease: "Back.easeOut",
+                    onComplete: () => {
+                        this.scaleX = 1;
+                        this.scaleY = 1;
+                        if (afterJumpCallback) afterJumpCallback();
+                    },
+                });
+            },
+        });
+    }
+
+    moveToTarget(targetX, targetY) {
+        if (!this.isAlive || this.isStuck) return;
+        const distance = Phaser.Math.Distance.Between(
+            this.x,
+            this.y,
+            targetX,
+            targetY
+        );
+        const duration = (distance / this.speed) * 1000;
+        if (this.currentTween) this.currentTween.stop();
+
+        this.currentTween = this.scene.tweens.add({
+            targets: this,
+            x: targetX,
+            y: targetY,
+            duration,
+            ease: "Cubic.easeOut",
+            onComplete: () => {
+                if (this.isAlive && !this.isStuck && !this.movingToPlayer) {
+                    const pr = this.scene.pathRegion;
+                    let newTargetX = Phaser.Math.Between(
+                        pr.x + 100,
+                        pr.x + pr.width - 100
+                    );
+                    let newTargetY = Phaser.Math.Between(
+                        pr.y + 100,
+                        pr.y + pr.height - 100
+                    );
+                    this.moveToTarget(newTargetX, newTargetY);
+                }
+            },
+        });
+    }
+
+    moveTowardPlayer(playerX, playerY, bugStickRange) {
+        if (!this.isAlive || this.isStuck) return;
+        this.movingToPlayer = true;
+
+        const angle = Phaser.Math.Angle.Between(
+            this.x,
+            this.y,
+            playerX,
+            playerY
+        );
+
+        const targetX = playerX - Math.cos(angle) * (bugStickRange * 0.5);
+        const targetY = playerY - Math.sin(angle) * (bugStickRange * 0.5);
+
+        const distance = Phaser.Math.Distance.Between(
+            this.x,
+            this.y,
+            targetX,
+            targetY
+        );
+        const duration = (distance / (this.speed * 1.5)) * 1000;
+
+        if (this.currentTween) this.currentTween.stop();
+
+        this.currentTween = this.scene.tweens.add({
+            targets: this,
+            x: targetX,
+            y: targetY,
+            duration,
+            ease: "Cubic.easeInOut",
+            onComplete: () => {
+                if (this.isAlive && !this.isStuck && this.movingToPlayer) {
+                    this.moveTowardPlayer(playerX, playerY, bugStickRange);
+                }
+            },
+        });
+    }
+}
