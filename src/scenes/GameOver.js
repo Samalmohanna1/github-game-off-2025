@@ -16,13 +16,9 @@ export class GameOver extends Scene {
     create() {
         this.cameras.main.fadeIn(1000);
 
-        this.add.rectangle(
-            720,
-            960,
-            1440,
-            1920,
-            globals.hexNum(globals.colors.black500)
-        );
+        this.add
+            .image(globals.centerX, globals.centerY, "gameOverBg")
+            .setOrigin(0.5);
 
         const gameOverText = this.add
             .text(720, 400, "GAME OVER", {
@@ -84,4 +80,3 @@ export class GameOver extends Scene {
         });
     }
 }
-

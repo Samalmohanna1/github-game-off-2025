@@ -56,11 +56,10 @@ export class GameScene extends Scene {
         this.bugTypes = {
             normal: {
                 type: "normal",
-                color: 0x8b4513,
                 health: 1,
                 speed: [60, 140],
                 points: 10,
-                size: 30,
+                size: 50,
             },
             fast: {
                 type: "fast",
@@ -68,7 +67,7 @@ export class GameScene extends Scene {
                 health: 1,
                 speed: [120, 200],
                 points: 15,
-                size: 30,
+                size: 50,
             },
             tank: {
                 type: "tank",
@@ -76,7 +75,7 @@ export class GameScene extends Scene {
                 health: 3,
                 speed: [30, 60],
                 points: 30,
-                size: 40,
+                size: 70,
             },
             splitter: {
                 type: "splitter",
@@ -92,7 +91,7 @@ export class GameScene extends Scene {
                 health: 10,
                 speed: [20, 40],
                 points: 100,
-                size: 50,
+                size: 100,
             },
         };
     }
@@ -100,8 +99,16 @@ export class GameScene extends Scene {
     create() {
         this.cameras.main.fadeIn(1000);
 
-        this.add.rectangle(720, 960, 1440, 1920, 0x2d5016);
         this.drawPath();
+        this.add.rectangle(720, 960, 1440, 1920, 0xf8f6f2);
+
+        this.pathWalkAnimation = this.add
+            .sprite(globals.centerX, globals.centerY, "walkFrame1")
+            .setOrigin(0.5);
+
+        this.pathWalkAnimation.on("animationstart", () => {
+            this.cameras.main.shake(1020, 0.001);
+        });
 
         this.player = this.add.circle(
             this.playerX,
@@ -196,9 +203,9 @@ export class GameScene extends Scene {
             targets: waveText,
             alpha: 0.3,
             scale: 1.2,
-            duration: 500,
+            duration: 300,
             yoyo: true,
-            repeat: 3,
+            repeat: 1,
             onComplete: () => {
                 waveText.destroy();
             },
@@ -282,13 +289,15 @@ export class GameScene extends Scene {
         if (bug.currentTween) {
             bug.currentTween.stop();
         }
+        const angle = Phaser.Math.Angle.Between(bug.x, bug.y, targetX, targetY);
+        bug.setRotation(angle + Math.PI / 2);
 
         bug.currentTween = this.tweens.add({
             targets: bug,
             x: targetX,
             y: targetY,
             duration: duration,
-            ease: "Cubic.easeOut",
+            ease: "Cubic.ease",
             onComplete: () => {
                 if (bug.isAlive && !bug.isStuck && !bug.movingToPlayer) {
                     const newX = Phaser.Math.Between(
@@ -311,6 +320,7 @@ export class GameScene extends Scene {
         bug.isStuck = true;
         bug.movingToPlayer = false;
         bug.isAlive = false;
+        bug.setStuck(true);
         this.bugsActive--;
         this.damageTakenThisWave = true;
 
@@ -454,6 +464,7 @@ export class GameScene extends Scene {
 
         if (bugHit) {
             this.stamina -= this.smashStaminaCost;
+            this.cameras.main.shake(200, 0.005);
         } else {
             this.stamina -= this.smashStaminaCost * 2;
 
@@ -612,6 +623,7 @@ export class GameScene extends Scene {
 
     completeWave() {
         this.inWave = false;
+        this.pathWalkAnimation.anims.play("pathWalk");
 
         if (!this.damageTakenThisWave) {
             const bonus = 100 * this.currentWave;
@@ -743,4 +755,3 @@ export class GameScene extends Scene {
         }
     }
 }
-

@@ -10,65 +10,96 @@ export default class Bug extends Phaser.GameObjects.Container {
         this.points = config.points;
         this.color = config.color;
         this.size = config.size;
+        this.spriteKey = config.spriteKey || "adultWalk";
         this.isAlive = true;
         this.isStuck = false;
         this.movingToPlayer = false;
 
         this.currentTween = null;
 
-        const body = scene.add.circle(0, 0, this.size, this.color);
-        this.add(body);
+        if (
+            scene.textures.exists(this.spriteKey) &&
+            scene.anims.exists("bugWalk")
+        ) {
+            this.sprite = scene.add.sprite(0, 0, this.spriteKey);
+            this.sprite.setScale(this.size / 100);
+            this.sprite.play("bugWalk");
 
-        const head = scene.add.circle(
-            0,
-            -this.size * 0.66,
-            this.size * 0.53,
-            this.color - 0x111111
-        );
-        this.add(head);
+            if (this.color) {
+                this.sprite.setTint(this.color);
+            }
 
-        const graphics = scene.add.graphics();
-        graphics.lineStyle(4, 0x000000, 1);
-        graphics.lineBetween(
-            -this.size * 0.2,
-            -this.size,
-            -this.size * 0.53,
-            -this.size * 1.46
-        );
-        graphics.lineBetween(
-            this.size * 0.2,
-            -this.size,
-            this.size * 0.53,
-            -this.size * 1.46
-        );
-        this.add(graphics);
+            this.add(this.sprite);
+        } else {
+            const body = scene.add.circle(0, 0, this.size, this.color);
+            this.add(body);
+
+            const head = scene.add.circle(
+                0,
+                -this.size * 0.66,
+                this.size * 0.53,
+                this.color - 0x111111
+            );
+            this.add(head);
+
+            const graphics = scene.add.graphics();
+            graphics.lineStyle(4, 0x000000, 1);
+            graphics.lineBetween(
+                -this.size * 0.2,
+                -this.size,
+                -this.size * 0.53,
+                -this.size * 1.46
+            );
+            graphics.lineBetween(
+                this.size * 0.2,
+                -this.size,
+                this.size * 0.53,
+                -this.size * 1.46
+            );
+            this.add(graphics);
+        }
 
         if (["tank", "boss"].includes(this.type)) {
             const healthBarBg = scene.add.rectangle(
                 0,
                 this.size + 15,
-                this.size * 2,
+                this.size,
                 8,
                 0x000000
             );
             const healthBar = scene.add.rectangle(
                 0,
                 this.size + 15,
-                this.size * 2,
+                this.size,
                 6,
                 0x00ff00
             );
             this.add(healthBarBg);
             this.add(healthBar);
             this.healthBar = healthBar;
-            this.maxHealthBarWidth = this.size * 2;
+            this.maxHealthBarWidth = this.size;
         }
 
         scene.add.existing(this);
     }
 
+    setStuck(isStuck) {
+        this.isStuck = isStuck;
+        if (this.sprite && this.sprite.anims) {
+            if (isStuck) {
+                this.sprite.anims.stop();
+                const firstFrame =
+                    this.scene.anims.get("bugWalk").frames[0].frame.name;
+                this.sprite.setFrame(firstFrame);
+            } else {
+                this.sprite.anims.play("bugWalk", true);
+            }
+        }
+    }
+
     takeDamage() {
         this.health--;
+
         if (this.healthBar) {
             const ratio = this.health / this.maxHealth;
             this.healthBar.width = this.maxHealthBarWidth * ratio;
@@ -76,8 +107,10 @@ export default class Bug extends Phaser.GameObjects.Container {
                 ratio > 0.5 ? 0x00ff00 : ratio > 0.25 ? 0xffff00 : 0xff0000
             );
         }
-        if (this.health <= 0) this.die();
-        else {
+
+        if (this.health <= 0) {
+            this.die();
+        } else {
             this.scene.tweens.add({
                 targets: this,
                 scaleX: 1.2,
@@ -91,6 +124,7 @@ export default class Bug extends Phaser.GameObjects.Container {
     die() {
         this.isAlive = false;
         if (this.currentTween) this.currentTween.stop();
+
         this.scene.tweens.add({
             targets: this,
             scaleX: 1.3,
@@ -138,6 +172,14 @@ export default class Bug extends Phaser.GameObjects.Container {
         );
         const duration = (distance / this.speed) * 1000;
         if (this.currentTween) this.currentTween.stop();
+
+        const angle = Phaser.Math.Angle.Between(
+            this.x,
+            this.y,
+            targetX,
+            targetY
+        );
+        this.setRotation(angle + Math.PI / 2);
 
         this.currentTween = this.scene.tweens.add({
             targets: this,
