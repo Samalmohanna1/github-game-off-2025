@@ -25,10 +25,10 @@ export class Tutorial extends Scene {
     }
 
     create() {
+        this.add.rectangle(720, 960, 1440, 1920, 0xf8f6f2);
         this.add
-            .image(globals.centerX, globals.centerY, "tutBg")
-            .setOrigin(0.5)
-            .setScale(2.5);
+            .image(globals.centerX, globals.centerY, "walkFrame2")
+            .setOrigin(0.5);
 
         this.showTooltip();
     }

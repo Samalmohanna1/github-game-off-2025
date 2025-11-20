@@ -4,17 +4,21 @@ export default class GameUI {
     constructor(scene) {
         this.scene = scene;
 
-        this.scoreText = scene.add.text(40, 80, "Score: 0", {
-            ...globals.bodyTextStyle,
-            fontSize: "40px",
-            fill: globals.hexString(globals.colors.black500),
-        });
+        this.scoreText = scene.add
+            .text(40, 80, "Score: 0", {
+                ...globals.bodyTextStyle,
+                fontSize: "40px",
+                fill: globals.hexString(globals.colors.black500),
+            })
+            .setDepth(100);
 
-        this.waveText = scene.add.text(40, 160, "Wave: 0", {
-            ...globals.bodyTextStyle,
-            fontSize: "40px",
-            fill: globals.hexString(globals.colors.black500),
-        });
+        this.waveText = scene.add
+            .text(40, 160, "Wave: 0", {
+                ...globals.bodyTextStyle,
+                fontSize: "40px",
+                fill: globals.hexString(globals.colors.black500),
+            })
+            .setDepth(100);
 
         this.comboText = scene.add
             .text(1400, 80, "", {
@@ -25,7 +29,7 @@ export default class GameUI {
                 strokeThickness: 4,
             })
             .setOrigin(1, 0)
-            .setDepth(50);
+            .setDepth(100);
 
         this.initStaminaBar();
     }
@@ -48,13 +52,15 @@ export default class GameUI {
             globals.hexNum(globals.colors.white500)
         );
 
-        this.staminaBar = this.scene.add.rectangle(
-            barX,
-            barY,
-            barWidth - 8,
-            barHeight - 8,
-            globals.hexNum(globals.colors.yellow500)
-        );
+        this.staminaBar = this.scene.add
+            .rectangle(
+                barX,
+                barY,
+                barWidth - 8,
+                barHeight - 8,
+                globals.hexNum(globals.colors.yellow500)
+            )
+            .setDepth(100);
 
         this.staminaText = this.scene.add
             .text(barX, barY, "100%", {
@@ -62,7 +68,8 @@ export default class GameUI {
                 fontSize: "32px",
                 fill: globals.hexString(globals.colors.black500),
             })
-            .setOrigin(0.5);
+            .setOrigin(0.5)
+            .setDepth(100);
     }
 
     updateScore(score) {

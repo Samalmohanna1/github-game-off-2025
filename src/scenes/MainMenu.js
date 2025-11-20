@@ -10,23 +10,8 @@ export class MainMenu extends Scene {
     create() {
         this.cameras.main.fadeIn(1000);
 
-        this.add.rectangle(
-            720,
-            960,
-            1440,
-            1920,
-            globals.hexNum(globals.colors.white600)
-        );
-
         this.add
-            .text(720, 300, "Dangerous Bug!", {
-                ...globals.bodyTextStyle,
-                wordWrap: globals.wordWrap.lg,
-                fontSize: "128px",
-                fill: globals.hexString(globals.colors.red600),
-                stroke: globals.hexString(globals.colors.black600),
-                strokeThickness: 8,
-            })
+            .image(globals.centerX, globals.centerY, "titleBg")
             .setOrigin(0.5);
 
         new Button(this, 720, 1350, "Start Game", {
@@ -39,4 +24,3 @@ export class MainMenu extends Scene {
         });
     }
 }
-
