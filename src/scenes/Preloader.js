@@ -27,7 +27,7 @@ export class Preloader extends Scene {
             .text(
                 globals.centerX,
                 globals.centerY + 100,
-                "A SleepySam Game",
+                "A SLEEPYSAM GAME",
                 globals.bodyTextStyle
             )
             .setOrigin(0.5);

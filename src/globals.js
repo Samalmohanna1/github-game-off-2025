@@ -1,6 +1,7 @@
 const colors = {
     yellow500: "E1A717",
-    yellow600: "B08312",
+    yellow600: "C59214",
+    yellow800: "8D6B0E",
     red500: "E22100",
     red600: "801300",
     blue500: "77A9C3",
@@ -30,8 +31,9 @@ export default {
     wordWrap,
 
     bodyTextStyle: {
-        fontFamily: "Arial Black",
-        fontSize: 64,
+        fontFamily: "Raleway",
+        fontStyle: "900",
+        fontSize: "64px",
         fill: hexString(colors.white500),
         wordWrap: wordWrap.md,
     },

@@ -45,7 +45,7 @@ export default class GameUI {
             barY,
             barWidth,
             barHeight,
-            globals.hexNum(globals.colors.yellow600)
+            globals.hexNum(globals.colors.yellow800)
         );
         this.staminaBarBg.setStrokeStyle(
             4,
