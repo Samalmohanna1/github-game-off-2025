@@ -64,7 +64,7 @@ export class Button {
         this.rect.on("pointerdown", () => {
             this.scene.tweens.add({
                 targets: this.rect,
-                alpha: 0.5,
+                alpha: 0.8,
                 duration: 100,
                 yoyo: true,
                 onComplete: () => {
@@ -89,7 +89,7 @@ export class Button {
 
     setEnabled(enabled) {
         this.rect.setInteractive(enabled);
-        this.rect.setAlpha(enabled ? 1 : 0.5);
-        this.text.setAlpha(enabled ? 1 : 0.5);
+        this.rect.setAlpha(enabled ? 1 : 0.8);
+        this.text.setAlpha(enabled ? 1 : 0.8);
     }
 }

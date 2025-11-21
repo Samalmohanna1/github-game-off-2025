@@ -17,13 +17,12 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    physics: {
-        default: "arcade",
-        arcade: {
-            gravity: { y: 400 },
+    scene: [Boot, Preloader, MainMenu, Tutorial, GameScene, GameOver],
+    text: {
+        style: {
+            fontFamily: "Raleway",
         },
     },
-    scene: [Boot, Preloader, MainMenu, Tutorial, GameScene, GameOver],
 };
 
 global.centerX = config.width / 2;

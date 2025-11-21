@@ -1,8 +1,8 @@
-/* @font-face {
-    font-family: 'Kode';
-    src: url('/fonts/KodeMono-Variable.ttf') format('truetype');
+@font-face {
+    font-family: 'Raleway';
+    src: url('./fonts/Raleway.ttf') format('truetype');
     font-weight: 100 900;
-} */
+}
 
 
 body {
@@ -10,6 +10,7 @@ body {
     padding: 0;
     color: rgba(255, 255, 255, 0.87);
     background-color: #0d1011;
+    font-family: 'Raleway';
 }
 
 canvas {

@@ -16,66 +16,48 @@ export class GameOver extends Scene {
     create() {
         this.cameras.main.fadeIn(1000);
 
+        if (this.wavesCompleted > 0) {
+            this.wavesCompleted -= 1;
+        }
+
         this.add
             .image(globals.centerX, globals.centerY, "gameOverBg")
             .setOrigin(0.5);
 
-        const gameOverText = this.add
-            .text(720, 400, "GAME OVER", {
+        this.add.text(
+            300,
+            750,
+            `Score: -----------------> ${this.finalScore}`,
+            {
                 ...globals.bodyTextStyle,
-                fontSize: "128px",
-                fill: globals.hexString(globals.colors.red500),
-            })
-            .setOrigin(0.5);
+                fontSize: "52px",
+                fontStyle: "700",
+            }
+        );
 
-        this.tweens.add({
-            targets: gameOverText,
-            scale: 1.1,
-            duration: 1000,
-            yoyo: true,
-            repeat: -1,
-            ease: "Sine.easeInOut",
+        this.add.text(
+            300,
+            900,
+            `Waves Survived: ----->  ${this.wavesCompleted}`,
+            {
+                ...globals.bodyTextStyle,
+                fontSize: "52px",
+                fontStyle: "700",
+            }
+        );
+
+        this.add.text(300, 1050, `Bugs Smashed: ------>  ${this.bugsSmashed}`, {
+            ...globals.bodyTextStyle,
+            fontSize: "52px",
+            fontStyle: "700",
         });
 
-        this.add
-            .text(720, 800, `Score: ${this.finalScore}`, {
-                ...globals.bodyTextStyle,
-                fontSize: "64px",
-                align: "left",
-            })
-            .setOrigin(0.5);
-
-        this.add
-            .text(720, 900, `Waves Survived: ${this.wavesCompleted - 1}`, {
-                ...globals.bodyTextStyle,
-                fontSize: "64px",
-                align: "left",
-            })
-            .setOrigin(0.5);
-
-        this.add
-            .text(720, 980, `Bugs Smashed: ${this.bugsSmashed}`, {
-                ...globals.bodyTextStyle,
-                fontSize: "64px",
-                align: "left",
-            })
-            .setOrigin(0.5);
-
-        new Button(this, 720, 1350, "PLAY AGAIN", {
+        new Button(this, 720, 1450, "PLAY AGAIN", {
             fillColor: globals.hexNum(globals.colors.yellow500),
             hoverColor: globals.hexNum(globals.colors.yellow600),
             textColor: globals.hexString(globals.colors.black500),
             onClick: () => {
                 this.scene.start("GameScene");
-            },
-        });
-
-        new Button(this, 720, 1520, "MAIN MENU", {
-            fillColor: globals.hexNum(globals.colors.blue500),
-            hoverColor: globals.hexNum(globals.colors.blue600),
-            textColor: globals.hexString(globals.colors.black500),
-            onClick: () => {
-                this.scene.start("MainMenu");
             },
         });
     }
