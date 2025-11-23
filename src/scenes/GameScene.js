@@ -56,6 +56,7 @@ export class GameScene extends Scene {
         this.bugTypes = {
             normal: {
                 type: "normal",
+                spriteKey: "adultWalk",
                 health: 1,
                 speed: [60, 140],
                 points: 10,
@@ -63,6 +64,7 @@ export class GameScene extends Scene {
             },
             fast: {
                 type: "fast",
+                spriteKey: "darthMaulWalk",
                 color: 0xff6600,
                 health: 1,
                 speed: [120, 200],
@@ -71,7 +73,9 @@ export class GameScene extends Scene {
             },
             tank: {
                 type: "tank",
+                spriteKey: "adultWalk",
                 color: 0x0066cc,
+                shape: "diamond",
                 health: 3,
                 speed: [30, 60],
                 points: 30,
@@ -79,15 +83,19 @@ export class GameScene extends Scene {
             },
             splitter: {
                 type: "splitter",
+                spriteKey: "adultWalk",
                 color: 0x9900cc,
+                shape: "circle",
                 health: 1,
                 speed: [50, 100],
                 points: 20,
-                size: 30,
+                size: 50,
             },
             boss: {
                 type: "boss",
+                spriteKey: "adultWalk",
                 color: 0xff0000,
+                shape: "square",
                 health: 10,
                 speed: [20, 40],
                 points: 100,
@@ -337,6 +345,13 @@ export class GameScene extends Scene {
 
         bug.setPosition(this.playerX + offsetX, this.playerY + offsetY);
         bug.setDepth(20);
+        const bugToPlayerAngle = Phaser.Math.Angle.Between(
+            bug.x,
+            bug.y,
+            this.playerX,
+            this.playerY
+        );
+        bug.setRotation(bugToPlayerAngle + Math.PI / 2);
 
         this.stuckBugs.push(bug);
 
@@ -559,19 +574,20 @@ export class GameScene extends Scene {
 
     spawnSplitterOffspring(x, y) {
         const offspringConfig = {
-            type: "normal",
+            type: "fast",
+            spriteKey: "babyWalk",
             color: 0xcc66ff,
             health: 1,
             speed: 100,
             points: 5,
-            size: 20,
+            size: 35,
         };
 
         const pr = this.pathRegion;
 
         for (let i = 0; i < 2; i++) {
             const angle = (Math.PI * 2 * i) / 2 + Math.random() * 0.5;
-            const spawnDistance = 80;
+            const spawnDistance = 140;
             const spawnX = x + Math.cos(angle) * spawnDistance;
             const spawnY = y + Math.sin(angle) * spawnDistance;
 

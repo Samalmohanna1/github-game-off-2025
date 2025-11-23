@@ -9,6 +9,7 @@ export default class Bug extends Phaser.GameObjects.Container {
         this.speed = config.speed;
         this.points = config.points;
         this.color = config.color;
+        this.shape = config.shape;
         this.size = config.size;
         this.spriteKey = config.spriteKey || "adultWalk";
         this.isAlive = true;
@@ -19,15 +20,11 @@ export default class Bug extends Phaser.GameObjects.Container {
 
         if (
             scene.textures.exists(this.spriteKey) &&
-            scene.anims.exists("bugWalk")
+            scene.anims.exists(this.spriteKey)
         ) {
             this.sprite = scene.add.sprite(0, 0, this.spriteKey);
             this.sprite.setScale(this.size / 100);
-            this.sprite.play("bugWalk");
-
-            if (this.color) {
-                this.sprite.setTint(this.color);
-            }
+            this.sprite.play(this.spriteKey);
 
             this.add(this.sprite);
         } else {
@@ -80,6 +77,44 @@ export default class Bug extends Phaser.GameObjects.Container {
             this.maxHealthBarWidth = this.size;
         }
 
+        if (this.shape) {
+            const shapeSize = 20;
+            const shapeY = 0;
+            const shapeColor = this.color || 0xffffff;
+
+            if (this.shape === "circle") {
+                const circle = scene.add.circle(
+                    0,
+                    shapeY,
+                    shapeSize * 0.6,
+                    shapeColor
+                );
+                circle.setStrokeStyle(2, 0x000000);
+                this.add(circle);
+            } else if (this.shape === "square") {
+                const square = scene.add.rectangle(
+                    0,
+                    shapeY,
+                    shapeSize,
+                    shapeSize,
+                    shapeColor
+                );
+                square.setStrokeStyle(2, 0x000000);
+                this.add(square);
+            } else if (this.shape === "diamond") {
+                const diamond = scene.add.rectangle(
+                    0,
+                    shapeY,
+                    shapeSize,
+                    shapeSize,
+                    shapeColor
+                );
+                diamond.setRotation(Math.PI / 4);
+                diamond.setStrokeStyle(2, 0x000000);
+                this.add(diamond);
+            }
+        }
+
         scene.add.existing(this);
     }
 
@@ -88,11 +123,11 @@ export default class Bug extends Phaser.GameObjects.Container {
         if (this.sprite && this.sprite.anims) {
             if (isStuck) {
                 this.sprite.anims.stop();
-                const firstFrame =
-                    this.scene.anims.get("bugWalk").frames[0].frame.name;
+                const firstFrame = this.scene.anims.get(this.spriteKey)
+                    .frames[0].frame.name;
                 this.sprite.setFrame(firstFrame);
             } else {
-                this.sprite.anims.play("bugWalk", true);
+                this.sprite.anims.play(this.spriteKey, true);
             }
         }
     }
@@ -125,12 +160,18 @@ export default class Bug extends Phaser.GameObjects.Container {
         this.isAlive = false;
         if (this.currentTween) this.currentTween.stop();
 
+        if (
+            this.type !== "fast" &&
+            this.sprite &&
+            this.scene.textures.exists("adultSmashed")
+        ) {
+            this.sprite.stop();
+            this.sprite.setTexture("adultSmashed");
+        }
         this.scene.tweens.add({
             targets: this,
-            scaleX: 1.3,
-            scaleY: 0.3,
             alpha: 0,
-            duration: 120,
+            duration: 800,
             onComplete: () => this.destroy(),
         });
     }
@@ -139,22 +180,41 @@ export default class Bug extends Phaser.GameObjects.Container {
         this.movingToPlayer = false;
         if (this.currentTween) this.currentTween.stop();
 
+        const shouldFlutter =
+            this.type !== "fast" &&
+            this.sprite &&
+            this.scene.textures.exists("adultFlutter") &&
+            this.scene.anims.exists("adultFlutter");
+
+        if (shouldFlutter) {
+            this.sprite.play("adultFlutter");
+        }
+
         this.scene.tweens.add({
             targets: this,
-            scaleX: 1.4,
-            scaleY: 1.4,
-            duration: 150,
+            scaleX: 1.2,
+            scaleY: 1.2,
+            duration: 250,
             yoyo: true,
             onComplete: () => {
                 this.currentTween = this.scene.tweens.add({
                     targets: this,
                     x,
                     y,
-                    duration: 200,
+                    duration: 400,
                     ease: "Back.easeOut",
                     onComplete: () => {
                         this.scaleX = 1;
                         this.scaleY = 1;
+
+                        if (
+                            shouldFlutter &&
+                            this.sprite &&
+                            this.scene.anims.exists(this.spriteKey)
+                        ) {
+                            this.sprite.play(this.spriteKey);
+                        }
+
                         if (afterJumpCallback) afterJumpCallback();
                     },
                 });
@@ -214,7 +274,7 @@ export default class Bug extends Phaser.GameObjects.Container {
             playerX,
             playerY
         );
-
+        this.setRotation(angle + Math.PI / 2);
         const targetX = playerX - Math.cos(angle) * (bugStickRange * 0.5);
         const targetY = playerY - Math.sin(angle) * (bugStickRange * 0.5);
 
