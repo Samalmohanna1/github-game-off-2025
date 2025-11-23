@@ -42,8 +42,21 @@ export class Preloader extends Scene {
         this.load.image("walkFrame2", "bgs/path-2.png");
         this.load.image("walkFrame3", "bgs/path-3.png");
         this.load.image("walkFrame4", "bgs/path-4.png");
+        this.load.image("adultSmashed", "animations/smashed.png");
 
         this.load.spritesheet("adultWalk", "animations/adult-walk.png", {
+            frameWidth: 250,
+            frameHeight: 250,
+        });
+        this.load.spritesheet("babyWalk", "animations/baby-walk.png", {
+            frameWidth: 250,
+            frameHeight: 250,
+        });
+        this.load.spritesheet("darthMaulWalk", "animations/darth-maul.png", {
+            frameWidth: 250,
+            frameHeight: 250,
+        });
+        this.load.spritesheet("adultFlutter", "animations/flutter.png", {
             frameWidth: 250,
             frameHeight: 250,
         });
@@ -63,7 +76,7 @@ export class Preloader extends Scene {
             repeat: 1,
         });
         this.anims.create({
-            key: "bugWalk",
+            key: "adultWalk",
             frames: this.anims.generateFrameNumbers("adultWalk", {
                 start: 0,
                 end: 3,
@@ -72,10 +85,38 @@ export class Preloader extends Scene {
             repeat: -1,
         });
 
+        this.anims.create({
+            key: "babyWalk",
+            frames: this.anims.generateFrameNumbers("babyWalk", {
+                start: 0,
+                end: 3,
+            }),
+            frameRate: 8,
+            repeat: -1,
+        });
+        this.anims.create({
+            key: "darthMaulWalk",
+            frames: this.anims.generateFrameNumbers("darthMaulWalk", {
+                start: 0,
+                end: 3,
+            }),
+            frameRate: 8,
+            repeat: -1,
+        });
+        this.anims.create({
+            key: "adultFlutter",
+            frames: this.anims.generateFrameNumbers("adultFlutter", {
+                start: 0,
+                end: 1,
+            }),
+            frameRate: 12,
+            repeat: -1,
+        });
+
         this.time.delayedCall(1000, () => {
             this.cameras.main.fadeOut(1000);
             this.cameras.main.once("camerafadeoutcomplete", () => {
-                this.scene.start("MainMenu");
+                this.scene.start("GameScene");
             });
         });
     }
