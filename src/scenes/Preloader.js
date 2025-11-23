@@ -60,10 +60,16 @@ export class Preloader extends Scene {
             frameWidth: 250,
             frameHeight: 250,
         });
+
+        this.load.audio("city", "audio/city.mp3");
+        this.load.audio("bgMusic", "audio/bg-music.mp3");
+        this.load.audio("smash", "audio/smash.mp3");
+        this.load.audio("gameOver", "audio/game-over.mp3");
+        this.load.audio("footsteps", "audio/footsteps.mp3");
+        this.load.audio("btnClick", "audio/btn-click.mp3");
     }
 
     create() {
-        //  When all the assets have loaded, Spritesheet animations that are used in the game can be made here.
         this.anims.create({
             key: "pathWalk",
             frames: [
@@ -73,7 +79,7 @@ export class Preloader extends Scene {
                 { key: "walkFrame4" },
             ],
             frameRate: 8,
-            repeat: 1,
+            repeat: 2,
         });
         this.anims.create({
             key: "adultWalk",
@@ -116,7 +122,7 @@ export class Preloader extends Scene {
         this.time.delayedCall(1000, () => {
             this.cameras.main.fadeOut(1000);
             this.cameras.main.once("camerafadeoutcomplete", () => {
-                this.scene.start("GameScene");
+                this.scene.start("MainMenu");
             });
         });
     }
