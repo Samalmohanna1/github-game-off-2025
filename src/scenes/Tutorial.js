@@ -1,5 +1,6 @@
 import { Scene } from "phaser";
 import globals from "../globals";
+import AudioManager from "../AudioManager";
 
 export class Tutorial extends Scene {
     constructor() {
@@ -25,6 +26,14 @@ export class Tutorial extends Scene {
     }
 
     create() {
+        this.audioManager = new AudioManager(this);
+
+        this.audioManager.playAmbientSound("city", {
+            volume: 0.2,
+            loop: true,
+        });
+
+        this.game.registry.set("audioManager", this.audioManager);
         this.add.rectangle(720, 960, 1440, 1920, 0xf8f6f2);
         this.add
             .image(globals.centerX, globals.centerY, "walkFrame2")

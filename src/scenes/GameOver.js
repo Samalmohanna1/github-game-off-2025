@@ -16,6 +16,13 @@ export class GameOver extends Scene {
     create() {
         this.cameras.main.fadeIn(1000);
 
+        this.audioManager = this.game.registry.get("audioManager");
+        this.audioManager.stopBackgroundMusic();
+        this.audioManager.playBackgroundMusic("gameOver", {
+            volume: 0.3,
+            loop: true,
+        });
+
         if (this.wavesCompleted > 0) {
             this.wavesCompleted -= 1;
         }

@@ -69,7 +69,7 @@ export class GameScene extends Scene {
                 health: 1,
                 speed: [120, 200],
                 points: 15,
-                size: 50,
+                size: 40,
             },
             tank: {
                 type: "tank",
@@ -89,7 +89,7 @@ export class GameScene extends Scene {
                 health: 1,
                 speed: [50, 100],
                 points: 20,
-                size: 50,
+                size: 65,
             },
             boss: {
                 type: "boss",
@@ -106,6 +106,12 @@ export class GameScene extends Scene {
 
     create() {
         this.cameras.main.fadeIn(1000);
+        this.audioManager = this.game.registry.get("audioManager");
+        this.audioManager.stopBackgroundMusic();
+        this.audioManager.playBackgroundMusic("bgMusic", {
+            volume: 0.3,
+            loop: true,
+        });
 
         this.drawPath();
         this.add.rectangle(720, 960, 1440, 1920, 0xf8f6f2);
@@ -546,6 +552,14 @@ export class GameScene extends Scene {
     smashBug(bug) {
         if (!bug.isAlive || bug.isStuck) return;
 
+        this.audioManager.playSound("smash", {
+            loop: false,
+            volume: 1,
+        });
+        this.audioManager.playSound("footsteps", {
+            loop: false,
+            volume: 1,
+        });
         bug.takeDamage();
 
         if (!bug.isAlive) {
@@ -639,7 +653,17 @@ export class GameScene extends Scene {
 
     completeWave() {
         this.inWave = false;
-        this.pathWalkAnimation.anims.play("pathWalk");
+
+        this.audioManager.playSound("footsteps", {
+            loop: true,
+            volume: 0.9,
+        });
+
+        this.pathWalkAnimation.play("pathWalk");
+
+        this.pathWalkAnimation.once("animationcomplete", () => {
+            this.audioManager.stopSound("footsteps");
+        });
 
         if (!this.damageTakenThisWave) {
             const bonus = 100 * this.currentWave;
@@ -663,7 +687,9 @@ export class GameScene extends Scene {
                 scale: 1.3,
                 alpha: 0,
                 duration: 2000,
-                onComplete: () => bonusText.destroy(),
+                onComplete: () => {
+                    bonusText.destroy();
+                },
             });
         }
 
