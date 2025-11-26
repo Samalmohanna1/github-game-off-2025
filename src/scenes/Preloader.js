@@ -37,12 +37,18 @@ export class Preloader extends Scene {
         this.load.setPath("assets");
         this.load.image("tutBg", "tut-bg.jpg");
         this.load.image("titleBg", "bgs/title-bg.webp");
-        this.load.image("gameOverBg", "bgs/game-over-bg.webp");
+        this.load.image("gameOverBgOld", "bgs/game-over-bg.webp");
+        this.load.image("gameOverBg", "bgs/game-over-bg.png");
         this.load.image("walkFrame1", "bgs/path-1.png");
         this.load.image("walkFrame2", "bgs/path-2.png");
         this.load.image("walkFrame3", "bgs/path-3.png");
         this.load.image("walkFrame4", "bgs/path-4.png");
         this.load.image("adultSmashed", "animations/smashed.png");
+        this.load.image("card", "ui/card.png");
+        this.load.spritesheet("playBtn", "ui/play-btn.png", {
+            frameWidth: 500,
+            frameHeight: 216,
+        });
 
         this.load.spritesheet("adultWalk", "animations/adult-walk.png", {
             frameWidth: 250,
@@ -66,7 +72,6 @@ export class Preloader extends Scene {
         this.load.audio("smash", "audio/smash.mp3");
         this.load.audio("gameOver", "audio/game-over.mp3");
         this.load.audio("footsteps", "audio/footsteps.mp3");
-        this.load.audio("btnClick", "audio/btn-click.mp3");
     }
 
     create() {

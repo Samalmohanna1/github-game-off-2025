@@ -8,15 +8,20 @@ export class Tutorial extends Scene {
         this.tooltips = [
             {
                 text: "Tap bugs to smash them!\nEach smash costs stamina.",
-                y: 960,
+                y: 560,
+                bugX: 720,
+                bugY: 950,
             },
             {
                 text: "Bugs that reach you will stick\nand drain your stamina!",
-                y: 1600,
+                y: 1200,
+                bugX: 720,
+                bugY: 1650,
             },
             {
-                text: "Smash bugs quickly for combo bonuses!\nGood luck!",
+                text: "Smash bugs quickly for \ncombo bonuses!",
                 y: 400,
+                combo: true,
             },
         ];
     }
@@ -39,6 +44,18 @@ export class Tutorial extends Scene {
             .image(globals.centerX, globals.centerY, "walkFrame2")
             .setOrigin(0.5);
 
+        this.comboText = this.add
+            .text(1400, 80, "3x COMBO", {
+                ...globals.bodyTextStyle,
+                fontSize: "56px",
+                fill: globals.hexString(globals.colors.yellow500),
+                stroke: globals.hexString(globals.colors.black600),
+                strokeThickness: 4,
+            })
+            .setOrigin(1, 0)
+            .setDepth(100)
+            .setAlpha(0);
+
         this.showTooltip();
     }
 
@@ -46,33 +63,49 @@ export class Tutorial extends Scene {
         if (this.tutorialStep < this.tooltips.length) {
             const tooltip = this.tooltips[this.tutorialStep];
 
-            const tooltipBg = this.add.rectangle(
-                720,
-                tooltip.y,
-                900,
-                250,
-                globals.hexNum(globals.colors.black600),
-                0.85
+            const tooltipBg = this.add
+                .image(720, tooltip.y, "card")
+                .setScale(0.6)
+                .setDepth(50)
+                .setAlpha(0.9);
+            const bug = this.add.sprite(
+                tooltip.bugX,
+                tooltip.bugY,
+                "adultWalk",
+                "0"
             );
-            tooltipBg.setStrokeStyle(
-                4,
-                globals.hexNum(globals.colors.white500)
-            );
+            bug.setAngle(180);
 
             const tooltipText = this.add
                 .text(720, tooltip.y - 20, tooltip.text, {
                     ...globals.bodyTextStyle,
                     fontSize: "44px",
+                    fontStyle: "500",
+                    lineSpacing: "20",
                 })
-                .setOrigin(0.5);
+                .setOrigin(0.5)
+                .setDepth(55);
 
             const continueText = this.add
-                .text(720, tooltip.y + 90, "Tap to continue", {
+                .text(720, tooltip.y + 110, "Tap to continue", {
                     ...globals.bodyTextStyle,
                     fontSize: "36px",
                     fill: globals.hexString(globals.colors.yellow600),
                 })
-                .setOrigin(0.5);
+                .setOrigin(0.5)
+                .setDepth(55);
+
+            if (tooltip.combo) {
+                this.comboText.setScale(1.3).setAlpha(1);
+                this.tweens.add({
+                    targets: this.comboText,
+                    scaleX: 1,
+                    scaleY: 1,
+                    duration: 400,
+                    repeat: -1,
+                    yoyo: true,
+                });
+            }
 
             this.tweens.add({
                 targets: continueText,
@@ -86,6 +119,7 @@ export class Tutorial extends Scene {
                 tooltipBg.destroy();
                 tooltipText.destroy();
                 continueText.destroy();
+                bug.destroy();
                 this.tutorialStep++;
 
                 if (this.tutorialStep < this.tooltips.length) {
