@@ -10,6 +10,9 @@ const colors = {
     white600: "C6B5A1",
     black500: "1B1819",
     black600: "0A0708",
+    cream200: "EDE9E0",
+    cream400: "D9D0BD",
+    cream600: "B5AB96",
 };
 
 const wordWrap = {

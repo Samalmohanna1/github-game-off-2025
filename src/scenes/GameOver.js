@@ -59,13 +59,8 @@ export class GameOver extends Scene {
             fontStyle: "700",
         });
 
-        new Button(this, 720, 1450, "PLAY AGAIN", {
-            fillColor: globals.hexNum(globals.colors.yellow500),
-            hoverColor: globals.hexNum(globals.colors.yellow600),
-            textColor: globals.hexString(globals.colors.black500),
-            onClick: () => {
-                this.scene.start("GameScene");
-            },
+        new Button(this, 720, 1350, {
+            targetScene: "GameScene",
         });
     }
 }

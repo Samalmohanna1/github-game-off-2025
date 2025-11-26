@@ -4,19 +4,26 @@ export default class GameUI {
     constructor(scene) {
         this.scene = scene;
 
+        scene.add
+            .image(210, 140, "card")
+            .setOrigin(0.5)
+            .setScale(0.33)
+            .setAlpha(0.9)
+            .setDepth(80);
+
         this.scoreText = scene.add
-            .text(40, 80, "Score: 0", {
+            .text(60, 75, "Score: 0", {
                 ...globals.bodyTextStyle,
-                fontSize: "40px",
-                fill: globals.hexString(globals.colors.black500),
+                fontSize: "36px",
+                fontStyle: "600",
             })
             .setDepth(100);
 
         this.waveText = scene.add
-            .text(40, 160, "Wave: 0", {
+            .text(60, 155, "Wave: 0", {
                 ...globals.bodyTextStyle,
-                fontSize: "40px",
-                fill: globals.hexString(globals.colors.black500),
+                fontSize: "36px",
+                fontStyle: "600",
             })
             .setDepth(100);
 
@@ -36,17 +43,19 @@ export default class GameUI {
 
     initStaminaBar() {
         const barWidth = 600;
-        const barHeight = 40;
+        const barHeight = 80;
         const barX = 720;
-        const barY = 50;
+        const barY = 80;
 
-        this.staminaBarBg = this.scene.add.rectangle(
-            barX,
-            barY,
-            barWidth,
-            barHeight,
-            globals.hexNum(globals.colors.yellow800)
-        );
+        this.staminaBarBg = this.scene.add
+            .rectangle(
+                barX,
+                barY,
+                barWidth,
+                barHeight,
+                globals.hexNum(globals.colors.yellow800)
+            )
+            .setRounded(20);
         this.staminaBarBg.setStrokeStyle(
             4,
             globals.hexNum(globals.colors.white500)

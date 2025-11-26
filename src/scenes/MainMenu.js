@@ -14,13 +14,8 @@ export class MainMenu extends Scene {
             .image(globals.centerX, globals.centerY, "titleBg")
             .setOrigin(0.5);
 
-        new Button(this, 720, 1350, "START GAME", {
-            fillColor: globals.hexNum(globals.colors.yellow500),
-            hoverColor: globals.hexNum(globals.colors.yellow600),
-            textColor: globals.hexString(globals.colors.black500),
-            onClick: () => {
-                this.scene.start("Tutorial");
-            },
+        new Button(this, 720, 1350, {
+            targetScene: "Tutorial",
         });
     }
 }
