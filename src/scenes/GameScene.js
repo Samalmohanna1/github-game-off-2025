@@ -37,7 +37,9 @@ export class GameScene extends Scene {
         this.comboMultiplier = 1;
 
         this.playerX = 720;
-        this.playerY = 1650;
+        this.playerY = 1892;
+        this.stickingX = 60;
+        this.stickingY = -180;
         this.playerRadius = 80;
         this.bugStickRange = 120;
         this.bugAttractRange = 300;
@@ -109,7 +111,7 @@ export class GameScene extends Scene {
         this.audioManager = this.game.registry.get("audioManager");
         this.audioManager.stopBackgroundMusic();
         this.audioManager.playBackgroundMusic("bgMusic", {
-            volume: 0.3,
+            volume: 0.2,
             loop: true,
         });
 
@@ -125,22 +127,32 @@ export class GameScene extends Scene {
         });
 
         this.player = this.add.circle(
-            this.playerX,
-            this.playerY,
+            this.playerX + this.stickingX,
+            this.playerY + this.stickingY,
             this.playerRadius,
-            0x4444ff
+            0x4444ff,
+            0
         );
         this.player.setDepth(10);
+        this.playerSprite = this.add
+            .sprite(
+                this.playerX,
+                this.playerY - this.playerY / 4,
+                "playerWalk",
+                0
+            )
+            .setDepth(50)
+            .setScale(2)
+            .setOrigin(0.5);
 
         this.attractRangeCircle = this.add.circle(
             this.playerX,
-            this.playerY,
+            this.playerY - 30,
             this.bugAttractRange,
-            globals.colors.red500,
-            0
+            globals.hexNum(globals.colors.black500),
+            0.2
         );
-        this.attractRangeCircle.setStrokeStyle(3, globals.colors.red500, 1);
-        this.attractRangeCircle.setDepth(5);
+        this.attractRangeCircle.setDepth(1);
 
         this.ui = new GameUI(this);
         this.ui.updateScore(this.score);
@@ -343,19 +355,30 @@ export class GameScene extends Scene {
         }
         this.tweens.killTweensOf(bug);
 
+        // Constrain angle to upper half of circle (from PI to 2*PI, or -PI to 0)
+        // This creates a semicircle above the player
+        const baseAngle = Math.PI; // Start from left side
+        const angleRange = Math.PI; // Cover 180 degrees (upper half)
         const angle =
-            this.stuckBugs.length * ((Math.PI * 2) / 8) + Math.random() * 0.5;
+            baseAngle +
+            this.stuckBugs.length * (angleRange / 8) +
+            Math.random() * 0.3;
+
         const radius = this.playerRadius + 20;
         const offsetX = Math.cos(angle) * radius;
         const offsetY = Math.sin(angle) * radius;
 
-        bug.setPosition(this.playerX + offsetX, this.playerY + offsetY);
-        bug.setDepth(20);
+        // Use the player circle's position (which includes stickingX and stickingY offsets)
+        const stickCenterX = this.playerX + this.stickingX;
+        const stickCenterY = this.playerY + this.stickingY;
+
+        bug.setPosition(stickCenterX + offsetX, stickCenterY + offsetY);
+        bug.setDepth(60);
         const bugToPlayerAngle = Phaser.Math.Angle.Between(
             bug.x,
             bug.y,
-            this.playerX,
-            this.playerY
+            stickCenterX,
+            stickCenterY
         );
         bug.setRotation(bugToPlayerAngle + Math.PI / 2);
 
@@ -455,6 +478,21 @@ export class GameScene extends Scene {
             scale: 1.5,
             duration: 200,
             onComplete: () => smashEffect.destroy(),
+        });
+
+        this.playerSprite.setPosition(x, y);
+
+        this.playerSprite.setOrigin(0.4, 0.3);
+        this.playerSprite.setTexture("playerStomp", 0);
+        this.playerSprite.play("playerStomp");
+
+        this.playerSprite.once("animationcomplete", () => {
+            this.playerSprite.setTexture("playerWalk", 0);
+            this.playerSprite.setPosition(
+                this.playerX,
+                this.playerY - this.playerY / 4
+            );
+            this.playerSprite.setOrigin(0.5);
         });
 
         for (let bug of this.bugs) {
@@ -581,7 +619,9 @@ export class GameScene extends Scene {
             this.ui.showCombo(this.comboCount);
 
             if (this.bugsActive === 0 && this.bugsSpawned >= this.bugsInWave) {
-                this.completeWave();
+                this.playerSprite.once("animationcomplete", () => {
+                    this.completeWave();
+                });
             }
         }
     }
@@ -660,9 +700,11 @@ export class GameScene extends Scene {
         });
 
         this.pathWalkAnimation.play("pathWalk");
+        this.playerSprite.play("playerWalk");
 
         this.pathWalkAnimation.once("animationcomplete", () => {
             this.audioManager.stopSound("footsteps");
+            this.playerSprite.stop("playerWalk").setFrame(0);
         });
 
         if (!this.damageTakenThisWave) {

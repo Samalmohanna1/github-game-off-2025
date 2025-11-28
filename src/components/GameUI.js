@@ -5,14 +5,14 @@ export default class GameUI {
         this.scene = scene;
 
         scene.add
-            .image(210, 140, "card")
+            .image(210, 110, "card")
             .setOrigin(0.5)
             .setScale(0.33)
             .setAlpha(0.9)
             .setDepth(80);
 
         this.scoreText = scene.add
-            .text(60, 75, "Score: 0", {
+            .text(60, 40, "Score: 0", {
                 ...globals.bodyTextStyle,
                 fontSize: "36px",
                 fontStyle: "600",
@@ -20,7 +20,7 @@ export default class GameUI {
             .setDepth(100);
 
         this.waveText = scene.add
-            .text(60, 155, "Wave: 0", {
+            .text(60, 115, "Wave: 0", {
                 ...globals.bodyTextStyle,
                 fontSize: "36px",
                 fontStyle: "600",
@@ -55,7 +55,9 @@ export default class GameUI {
                 barHeight,
                 globals.hexNum(globals.colors.yellow800)
             )
-            .setRounded(20);
+            .setRounded(20)
+            .setDepth(90)
+            .setAlpha(0.5);
         this.staminaBarBg.setStrokeStyle(
             4,
             globals.hexNum(globals.colors.white500)
