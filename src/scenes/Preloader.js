@@ -66,6 +66,14 @@ export class Preloader extends Scene {
             frameWidth: 250,
             frameHeight: 250,
         });
+        this.load.spritesheet("playerWalk", "animations/playerWalk.png", {
+            frameWidth: 500,
+            frameHeight: 500,
+        });
+        this.load.spritesheet("playerStomp", "animations/playerStomp.png", {
+            frameWidth: 500,
+            frameHeight: 500,
+        });
 
         this.load.audio("city", "audio/city.mp3");
         this.load.audio("bgMusic", "audio/bg-music.mp3");
@@ -92,7 +100,7 @@ export class Preloader extends Scene {
                 start: 0,
                 end: 3,
             }),
-            frameRate: 8,
+            frameRate: 12,
             repeat: -1,
         });
 
@@ -102,7 +110,7 @@ export class Preloader extends Scene {
                 start: 0,
                 end: 3,
             }),
-            frameRate: 8,
+            frameRate: 12,
             repeat: -1,
         });
         this.anims.create({
@@ -111,17 +119,37 @@ export class Preloader extends Scene {
                 start: 0,
                 end: 3,
             }),
-            frameRate: 8,
+            frameRate: 12,
             repeat: -1,
         });
         this.anims.create({
             key: "adultFlutter",
             frames: this.anims.generateFrameNumbers("adultFlutter", {
                 start: 0,
-                end: 1,
+                end: 2,
             }),
             frameRate: 12,
             repeat: -1,
+        });
+        this.anims.create({
+            key: "playerWalk",
+            frames: this.anims.generateFrameNumbers("playerWalk", {
+                start: 0,
+                end: 3,
+            }),
+            frameRate: 8,
+            repeat: -1,
+        });
+
+        this.anims.create({
+            key: "playerStomp",
+            frames: this.anims.generateFrameNumbers("playerStomp", {
+                start: 0,
+                end: 2,
+            }),
+            frameRate: 12,
+            repeat: 0,
+            yoyo: true,
         });
 
         this.time.delayedCall(1000, () => {

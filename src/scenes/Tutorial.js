@@ -7,7 +7,7 @@ export class Tutorial extends Scene {
         super("Tutorial");
         this.tooltips = [
             {
-                text: "Tap bugs to smash them!\nEach smash costs stamina.",
+                text: "Tap bugs to stomp them!\nEach stomp costs stamina.",
                 y: 560,
                 bugX: 720,
                 bugY: 950,
@@ -19,7 +19,7 @@ export class Tutorial extends Scene {
                 bugY: 1650,
             },
             {
-                text: "Smash bugs quickly for \ncombo bonuses!",
+                text: "Stomp bugs quickly for \ncombo bonuses!",
                 y: 400,
                 combo: true,
             },
@@ -42,6 +42,18 @@ export class Tutorial extends Scene {
         this.add.rectangle(720, 960, 1440, 1920, 0xf8f6f2);
         this.add
             .image(globals.centerX, globals.centerY, "walkFrame2")
+            .setOrigin(0.5);
+
+        this.attractRangeCircle = this.add.circle(
+            720,
+            1862,
+            300,
+            globals.hexNum(globals.colors.black500),
+            0.2
+        );
+        this.add
+            .sprite(720, 1892 - 1892 / 4, "playerWalk", 0)
+            .setScale(2)
             .setOrigin(0.5);
 
         this.comboText = this.add
