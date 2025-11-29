@@ -205,15 +205,13 @@ export class GameScene extends Scene {
             .text(
                 720,
                 960,
-                isBossWave
-                    ? `BOSS WAVE ${this.currentWave}!`
-                    : `WAVE ${this.currentWave}`,
+                isBossWave ? `BOSS WAVE!` : `WAVE ${this.currentWave}`,
                 {
                     ...globals.bodyTextStyle,
                     fontSize: isBossWave ? "110px" : "128px",
                     fill: isBossWave
                         ? globals.hexString(globals.colors.red500)
-                        : globals.hexString(globals.colors.yellow500),
+                        : globals.hexString(globals.colors.blue600),
                     stroke: globals.hexString(globals.colors.black500),
                     strokeThickness: 8,
                 }
@@ -223,7 +221,7 @@ export class GameScene extends Scene {
 
         this.tweens.add({
             targets: waveText,
-            alpha: 0.3,
+            alpha: 0.8,
             scale: 1.2,
             duration: 300,
             yoyo: true,
@@ -709,7 +707,7 @@ export class GameScene extends Scene {
                 .text(720, 960, `PERFECT WAVE!\n+${bonus} BONUS`, {
                     ...globals.bodyTextStyle,
                     fontSize: "64px",
-                    fill: globals.hexString(globals.colors.yellow500),
+                    fill: globals.hexString(globals.colors.blue600),
                     stroke: globals.hexString(globals.colors.black500),
                     strokeThickness: 6,
                     align: "center",
@@ -720,8 +718,8 @@ export class GameScene extends Scene {
             this.tweens.add({
                 targets: bonusText,
                 scale: 1.3,
-                alpha: 0,
-                duration: 2000,
+                alpha: 0.8,
+                duration: 900,
                 onComplete: () => {
                     bonusText.destroy();
                 },

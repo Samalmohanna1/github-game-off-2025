@@ -17,3 +17,11 @@ canvas {
     margin-inline: auto;
     margin-block: auto;
 }
+
+#game-container {
+    background: repeating-linear-gradient(90deg,
+            #1B1819 0px,
+            #1B1819 2px,
+            #0A0708 2px,
+            #0A0708 8px);
+}

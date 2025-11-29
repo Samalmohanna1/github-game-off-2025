@@ -102,7 +102,7 @@ export class Tutorial extends Scene {
                 .text(720, tooltip.y + 110, "Tap to continue", {
                     ...globals.bodyTextStyle,
                     fontSize: "36px",
-                    fill: globals.hexString(globals.colors.yellow600),
+                    fill: globals.hexString(globals.colors.yellow500),
                 })
                 .setOrigin(0.5)
                 .setDepth(55);
@@ -121,7 +121,7 @@ export class Tutorial extends Scene {
 
             this.tweens.add({
                 targets: continueText,
-                alpha: 0.3,
+                alpha: 0.4,
                 duration: 500,
                 yoyo: true,
                 repeat: -1,
