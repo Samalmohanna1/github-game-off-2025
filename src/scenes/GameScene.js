@@ -17,16 +17,16 @@ export class GameScene extends Scene {
 
         this.maxStamina = 100;
         this.stamina = this.maxStamina;
-        this.staminaRegenRate = 5;
+        this.staminaRegenRate = 6;
         this.smashStaminaCost = 10;
         this.bugDrainRate = 2;
 
         this.currentWave = 0;
-        this.bugsInWave = 5;
+        this.bugsInWave = 5 + (this.currentWave - 1) * 2;
         this.bugsSpawned = 0;
         this.bugsActive = 0;
         this.spawnTimer = 0;
-        this.spawnInterval = 800;
+        this.spawnInterval = Math.max(500, 800 - (this.currentWave - 1) * 30);
         this.inWave = false;
         this.damageTakenThisWave = false;
         this.bugsSmashed = 0;
@@ -43,10 +43,6 @@ export class GameScene extends Scene {
         this.playerRadius = 80;
         this.bugStickRange = 120;
         this.bugAttractRange = 300;
-
-        this.bugSpray = null;
-        this.bugSprayTimer = 0;
-        this.bugSpraySpawnInterval = 15000;
 
         this.pathRegion = {
             x: 120,
@@ -69,7 +65,7 @@ export class GameScene extends Scene {
                 spriteKey: "darthMaulWalk",
                 color: 0xff6600,
                 health: 1,
-                speed: [120, 200],
+                speed: [140, 200],
                 points: 15,
                 size: 40,
             },
@@ -79,7 +75,7 @@ export class GameScene extends Scene {
                 color: 0x0066cc,
                 shape: "diamond",
                 health: 3,
-                speed: [30, 60],
+                speed: [40, 80],
                 points: 30,
                 size: 70,
             },
@@ -99,7 +95,7 @@ export class GameScene extends Scene {
                 color: 0xff0000,
                 shape: "square",
                 health: 10,
-                speed: [20, 40],
+                speed: [40, 80],
                 points: 100,
                 size: 100,
             },
@@ -355,10 +351,8 @@ export class GameScene extends Scene {
         }
         this.tweens.killTweensOf(bug);
 
-        // Constrain angle to upper half of circle (from PI to 2*PI, or -PI to 0)
-        // This creates a semicircle above the player
-        const baseAngle = Math.PI; // Start from left side
-        const angleRange = Math.PI; // Cover 180 degrees (upper half)
+        const baseAngle = Math.PI;
+        const angleRange = Math.PI;
         const angle =
             baseAngle +
             this.stuckBugs.length * (angleRange / 8) +
@@ -368,7 +362,6 @@ export class GameScene extends Scene {
         const offsetX = Math.cos(angle) * radius;
         const offsetY = Math.sin(angle) * radius;
 
-        // Use the player circle's position (which includes stickingX and stickingY offsets)
         const stickCenterX = this.playerX + this.stickingX;
         const stickCenterY = this.playerY + this.stickingY;
 
@@ -525,10 +518,10 @@ export class GameScene extends Scene {
             this.stamina -= this.smashStaminaCost;
             this.cameras.main.shake(200, 0.005);
         } else {
-            this.stamina -= this.smashStaminaCost * 2;
+            this.stamina -= this.smashStaminaCost * 1.5;
 
             const missText = this.add
-                .text(x, y, `-${this.smashStaminaCost * 2}`, {
+                .text(x, y, `-${this.smashStaminaCost * 1.5}`, {
                     ...globals.bodyTextStyle,
                     fontSize: "32px",
                     fill: globals.hexString(globals.colors.red600),
@@ -783,10 +776,12 @@ export class GameScene extends Scene {
             }
         }
 
-        if (this.stamina < this.maxStamina && this.stuckBugs.length === 0) {
+        if (this.stamina < this.maxStamina) {
+            const regenMultiplier = this.stuckBugs.length === 0 ? 1 : 0.3;
             this.stamina = Math.min(
                 this.maxStamina,
-                this.stamina + this.staminaRegenRate * deltaSeconds
+                this.stamina +
+                    this.staminaRegenRate * deltaSeconds * regenMultiplier
             );
             this.ui.updateStamina(this.stamina, this.maxStamina);
         }
