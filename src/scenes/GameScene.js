@@ -21,7 +21,7 @@ export class GameScene extends Scene {
         this.smashStaminaCost = 10;
         this.bugDrainRate = 2;
 
-        this.currentWave = 8;
+        this.currentWave = 0;
         this.bugsInWave = 5 + (this.currentWave - 1) * 2;
         this.bugsSpawned = 0;
         this.bugsActive = 0;
