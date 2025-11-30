@@ -45,6 +45,7 @@ export class Preloader extends Scene {
         this.load.image("walkFrame4", "bgs/path-4.png");
         this.load.image("adultSmashed", "animations/smashed.png");
         this.load.image("card", "ui/card.png");
+        this.load.image("bugSpray", "animations/bugSpray.png");
         this.load.spritesheet("playBtn", "ui/play-btn.png", {
             frameWidth: 500,
             frameHeight: 216,
