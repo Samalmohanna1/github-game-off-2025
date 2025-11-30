@@ -21,7 +21,7 @@ export class GameScene extends Scene {
         this.smashStaminaCost = 10;
         this.bugDrainRate = 2;
 
-        this.currentWave = 0;
+        this.currentWave = 8;
         this.bugsInWave = 5 + (this.currentWave - 1) * 2;
         this.bugsSpawned = 0;
         this.bugsActive = 0;
@@ -43,6 +43,10 @@ export class GameScene extends Scene {
         this.playerRadius = 80;
         this.bugStickRange = 120;
         this.bugAttractRange = 300;
+
+        this.bugSpray = null;
+        this.bugSprayActive = false;
+        this.bugSprayDropped = false;
 
         this.pathRegion = {
             x: 120,
@@ -150,6 +154,8 @@ export class GameScene extends Scene {
         );
         this.attractRangeCircle.setDepth(1);
 
+        this.bugSprayGroup = this.add.group();
+
         this.ui = new GameUI(this);
         this.ui.updateScore(this.score);
         this.ui.updateWave(this.currentWave);
@@ -191,6 +197,7 @@ export class GameScene extends Scene {
         this.bugsSpawned = 0;
         this.inWave = true;
         this.damageTakenThisWave = false;
+        this.bugSprayDropped = false;
 
         this.stamina = this.maxStamina;
         this.ui.updateStamina(this.stamina, this.maxStamina);
@@ -230,6 +237,148 @@ export class GameScene extends Scene {
                 waveText.destroy();
             },
         });
+        if (this.currentWave >= 9) {
+            const randomDelay = Phaser.Math.Between(5000, 8000);
+            this.time.delayedCall(randomDelay, () => {
+                if (this.inWave) {
+                    this.spawnBugSpray();
+                }
+            });
+        }
+    }
+
+    spawnBugSpray() {
+        if (this.bugSprayDropped || this.bugSpray) return;
+
+        this.bugSprayDropped = true;
+
+        const pr = this.pathRegion;
+        const spawnX = Phaser.Math.Between(pr.x + 100, pr.x + pr.width - 100);
+        const spawnY = -100;
+
+        this.bugSpray = this.add.image(spawnX, spawnY, "bugSpray");
+        this.bugSpray.setDepth(150).setInteractive().setScale(0.6);
+
+        this.tweens.add({
+            targets: this.bugSpray,
+            scale: 0.7,
+            duration: 500,
+            yoyo: true,
+            repeat: -1,
+        });
+
+        this.tweens.add({
+            targets: this.bugSpray,
+            y: 2100,
+            duration: Phaser.Math.Between(5500, 7000),
+            ease: "Cubic.ease",
+            onComplete: () => {
+                if (this.bugSpray) {
+                    this.bugSpray.destroy();
+                    this.bugSpray = null;
+                }
+            },
+        });
+
+        this.bugSpray.on("pointerover", () => {
+            this.input.setDefaultCursor("pointer");
+            this.bugSpray.setScale(0.8);
+        });
+
+        this.bugSpray.on("pointerout", () => {
+            this.input.setDefaultCursor("default");
+        });
+
+        this.bugSpray.on("pointerdown", (pointer) => {
+            pointer.event.stopPropagation();
+            this.activateBugSpray();
+            if (this.bugSpray) {
+                this.bugSpray.destroy();
+                this.bugSpray = null;
+            }
+            this.input.setDefaultCursor("default");
+        });
+    }
+
+    activateBugSpray() {
+        this.audioManager.playSound("smash", {
+            loop: false,
+            volume: 1.5,
+        });
+
+        const sprayEffect = this.add.circle(720, 960, 100, 0x00ff00, 0.7);
+        sprayEffect.setDepth(90);
+
+        this.tweens.add({
+            targets: sprayEffect,
+            scale: 15,
+            alpha: 0,
+            duration: 800,
+            onComplete: () => sprayEffect.destroy(),
+        });
+
+        const bugsToKill = [];
+        for (let bug of this.bugs) {
+            if (bug.isAlive && !bug.isStuck && bug.active) {
+                bugsToKill.push(bug);
+            }
+        }
+
+        const killCount = Math.ceil(bugsToKill.length * 0.55);
+
+        Phaser.Utils.Array.Shuffle(bugsToKill);
+
+        for (let i = 0; i < killCount; i++) {
+            const bug = bugsToKill[i];
+
+            const bugEffect = this.add.circle(bug.x, bug.y, 50, 0x00ff00, 0.5);
+            bugEffect.setDepth(85);
+
+            this.tweens.add({
+                targets: bugEffect,
+                scale: 2,
+                alpha: 0,
+                duration: 500,
+                onComplete: () => bugEffect.destroy(),
+            });
+
+            this.score += bug.points;
+
+            bug.isAlive = false;
+            this.bugsActive--;
+
+            if (bug.currentTween) {
+                bug.currentTween.stop();
+            }
+            this.tweens.killTweensOf(bug);
+
+            bug.destroy();
+        }
+
+        this.ui.updateScore(this.score);
+
+        const sprayText = this.add
+            .text(720, 960, `BUG SPRAY!\n${killCount} BUGS ELIMINATED`, {
+                ...globals.bodyTextStyle,
+                fontSize: "64px",
+                fill: globals.hexString(globals.colors.green500),
+                stroke: globals.hexString(globals.colors.black500),
+                strokeThickness: 6,
+                align: "center",
+            })
+            .setOrigin(0.5)
+            .setDepth(100);
+
+        this.tweens.add({
+            targets: sprayText,
+            y: 860,
+            alpha: 0,
+            duration: 1500,
+            onComplete: () => sprayText.destroy(),
+        });
+        if (this.bugsActive === 0 && this.bugsSpawned >= this.bugsInWave) {
+            this.completeWave();
+        }
     }
 
     spawnBug() {
@@ -739,7 +888,6 @@ export class GameScene extends Scene {
         this.bugs.forEach((bug) => {
             if (bug.currentTween) bug.currentTween.stop();
         });
-
         this.time.removeAllEvents();
 
         this.time.delayedCall(500, () => {
@@ -757,6 +905,10 @@ export class GameScene extends Scene {
         this.bugs.forEach((bug) => bug.destroy());
         this.stuckBugs.forEach((bug) => bug.destroy());
 
+        if (this.bugSpray) {
+            this.bugSpray.destroy();
+            this.bugSpray = null;
+        }
         this.time.removeAllEvents();
     }
 
